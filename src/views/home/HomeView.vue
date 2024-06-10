@@ -34,9 +34,9 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, onUnmounted} from "vue";
-import {menuTab} from "@/stores/modules/MenuTab";
+import {useMenuTab} from "@/stores/modules/MenuTab";
 
-const menuTabBar = menuTab()
+const menuTabBar = useMenuTab()
 const router = useRouter()
 
 const friendList = [{

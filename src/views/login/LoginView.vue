@@ -42,6 +42,9 @@
 import {reactive, ref} from 'vue'
 import {userLogin} from '@/api/user'
 import {useRouter} from 'vue-router'
+import {useUserInfo} from "@/stores/modules/UserInfo";
+
+const userInfo = useUserInfo()
 
 const router = useRouter()
 
@@ -57,12 +60,13 @@ const loading = ref(false)
 
 const onSubmit = async () => {
   try {
-    const response = await userLogin(null, { username: 'hanli', password: '12345' });
+    const response = await userLogin(null, { username: form.username, password: form.password });
 
     if (response.success) {
-
       // 将 token 存储在 localStorage
       localStorage.setItem('token', response.data.token);
+
+      await userInfo.fetchUserInfo()
 
       // 跳转到 '/home'
       await router.push('/home');
@@ -72,6 +76,8 @@ const onSubmit = async () => {
     }
   } catch (error) {
     console.error("Login request failed:", error);
+
+    return
   }
 };
 

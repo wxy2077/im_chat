@@ -18,13 +18,13 @@
 
     <!--  输入框  -->
     <div class="chat-user-panel">
-      <BottomInput></BottomInput>
+      <BottomInput @sendMsg="sendMsg"></BottomInput>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
+import {ref, reactive} from 'vue';
 import {useRouter} from 'vue-router';
 import ChatItem from "./comps/ChatItem.vue";
 import BottomInput from "./comps/BottomInput.vue";
@@ -36,7 +36,7 @@ const goBack = function () {
   router.go(-1);
 };
 
-const messageList = [
+const messageList = reactive([
   {
     isRight: true,
     message: 'hello11'
@@ -45,9 +45,14 @@ const messageList = [
     isRight: false,
     message: 'hello22'
   }
-]
+])
 
-let msg = ref('');
+const sendMsg = (msg: string) => {
+  messageList.push({
+    isRight: true,
+    message: msg
+  })
+}
 
 
 </script>

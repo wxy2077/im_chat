@@ -17,9 +17,9 @@
 
 import {ref} from "vue";
 
-import {menuTab} from "@/stores/modules/MenuTab";
+import {useMenuTab} from "@/stores/modules/MenuTab";
 
-const menuTabBar = menuTab()
+const menuTabBar = useMenuTab()
 
 const active = ref('chat');
 

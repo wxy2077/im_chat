@@ -1,16 +1,24 @@
 
 
-import {ref} from 'vue'
 import {defineStore}  from "pinia";
+import {userInfo} from '@/api/user'
 
+export const useUserInfo = defineStore('useUserInfo', {
 
-export const useUserInfo = defineStore('UserInfo', () => {
+    state() {
+        return {
+           userInfo: {}
+        }
+    },
 
-    const userInfo = ref({
-        name: '卡卡罗特',
-        avatar: 'https://avatars.githubusercontent.com/u/33140097',
-        userId: 1,
-        time: '2022-12-12 12:12:12',
-    })
-    return {userInfo}
+    actions: {
+        async fetchUserInfo() {
+            const response = await userInfo();
+            if (response.success) {
+                localStorage.setItem("user", JSON.stringify(response.data))
+                this.userInfo = response.data
+            }
+        }
+    }
+
 })

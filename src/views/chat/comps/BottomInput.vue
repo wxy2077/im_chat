@@ -7,28 +7,30 @@
         clearable
     />
     <van-button
-        @click="sendMessage"
+        @click="sendMsg"
         size="small"
         type="primary"
         style="width: 50px;"
-    >发送</van-button>
+    >发送
+    </van-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import {ref} from 'vue'
+
+import { defineEmits } from 'vue'
+const emit = defineEmits(['sendMsg'])
 
 const inputValue = ref('')
 
 
-const sendMessage = () => {
+const sendMsg = () => {
   if (inputValue.value.trim()) {
-    console.log('Message sent:', inputValue.value)
+    emit('sendMsg', inputValue.value)
     inputValue.value = ''
   }
 }
-
-
 
 </script>
 

@@ -2,7 +2,7 @@
 
 import {defineStore}  from "pinia";
 
-export const menuTab = defineStore('menuTab', {
+export const useMenuTab = defineStore('useMenuTab', {
 
     state: () => {
         return {
