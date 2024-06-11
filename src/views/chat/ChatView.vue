@@ -3,7 +3,7 @@
     <van-nav-bar
         fixed
         placeholder
-        :title="user.name"
+        :title="targetUser.name"
         right-text="..."
         left-arrow
         @click-left="goBack"
@@ -12,7 +12,10 @@
     <!--    内容 -->
     <div class="chat-content">
       <template v-for="(item, index) in messageList" :key="index">
-        <ChatItem :avatar="user.avatar" :message="item.message" :isRight="item.isRight" ></ChatItem>
+        <ChatItem :avatar="item.isRight ? user.avatar : targetUser.avatar"
+                  :message="item.message"
+                  :isRight="item.isRight">
+        </ChatItem>
       </template>
     </div>
 
@@ -24,29 +27,33 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, onMounted} from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import ChatItem from "./comps/ChatItem.vue";
 import BottomInput from "./comps/BottomInput.vue";
-import { useWebSocketStore } from '@/stores/websocketStore';
+import {useWebSocketStore} from '@/stores/websocketStore';
 
 const websocketStore = useWebSocketStore();
 const router = useRouter();
-const user = history.state.user
+const targetUser = history.state.targetUser
 
 const goBack = function () {
   router.go(-1);
 };
 
+const user = ref({avatar: ''});
+
 onMounted(() => {
-  const token =localStorage.getItem("token")
-  if(!websocketStore.isConnected && token) {
+  const token = localStorage.getItem("token")
+  if (!websocketStore.isConnected && token) {
     websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token);
+  }
+  const userData = localStorage.getItem("user");
+  if (userData) {
+    user.value = JSON.parse(userData);
   }
 })
 
-// onUnmounted(() => {
-// })
 
 const messageList = reactive([
   {
@@ -73,11 +80,11 @@ const sendMsg = (msg: string) => {
 
 
 <style scoped>
-.chat-content{
+.chat-content {
   margin-bottom: 55px;
 }
 
-.chat-user-panel{
+.chat-user-panel {
   position: fixed;
   bottom: 0;
   left: 0;

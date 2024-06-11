@@ -43,21 +43,21 @@ const menuTabBar = useMenuTab()
 const router = useRouter()
 
 const friendList = [{
-  name: "Tom",
-  avatar: "https://img01.yzcdn.cn/vant/cat.jpeg",
+  name: "小飞飞",
+  avatar: "https://avatars.githubusercontent.com/u/101162076",
   userId: 2,
   time: "2022-12-12 12:12:12",
 }, {
-  name: "Jerry",
-  avatar: "https://img01.yzcdn.cn/vant/cat.jpeg",
-  userId: 3,
+  name: "Peppa",
+  avatar: "https://avatars.githubusercontent.com/u/12712884",
+  userId: 4,
   time: "2022-12-12 12:12:12",
 }]
 
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: {user: item}
+    state: {targetUser: item}
   })
 }
 
