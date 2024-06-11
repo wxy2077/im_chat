@@ -35,17 +35,20 @@
 import {useRouter} from "vue-router";
 import {onMounted, onUnmounted} from "vue";
 import {useMenuTab} from "@/stores/modules/MenuTab";
+import { useWebSocketStore } from '@/stores/websocketStore';
+
+const websocketStore = useWebSocketStore();
 
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
 const friendList = [{
-  name: "张三",
+  name: "Tom",
   avatar: "https://img01.yzcdn.cn/vant/cat.jpeg",
   userId: 2,
   time: "2022-12-12 12:12:12",
 }, {
-  name: "李四",
+  name: "Jerry",
   avatar: "https://img01.yzcdn.cn/vant/cat.jpeg",
   userId: 3,
   time: "2022-12-12 12:12:12",
@@ -57,6 +60,13 @@ const toChart = (item: any) => {
     state: {user: item}
   })
 }
+
+onMounted(() => {
+  const token =localStorage.getItem("token")
+  if(!websocketStore.isConnected && token) {
+    websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token);
+  }
+})
 
 
 onMounted(() => {

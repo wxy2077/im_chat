@@ -24,17 +24,29 @@
 </template>
 
 <script setup lang="ts">
-import {ref, reactive} from 'vue';
+import {reactive, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
 import ChatItem from "./comps/ChatItem.vue";
 import BottomInput from "./comps/BottomInput.vue";
+import { useWebSocketStore } from '@/stores/websocketStore';
 
+const websocketStore = useWebSocketStore();
 const router = useRouter();
 const user = history.state.user
 
 const goBack = function () {
   router.go(-1);
 };
+
+onMounted(() => {
+  const token =localStorage.getItem("token")
+  if(!websocketStore.isConnected && token) {
+    websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token);
+  }
+})
+
+// onUnmounted(() => {
+// })
 
 const messageList = reactive([
   {
@@ -52,6 +64,8 @@ const sendMsg = (msg: string) => {
     isRight: true,
     message: msg
   })
+  let data = {content_type: 1, content: msg}
+  websocketStore.sendMessage(JSON.stringify(data))
 }
 
 

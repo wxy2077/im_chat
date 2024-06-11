@@ -1,6 +1,7 @@
 // src/store/websocketStore.ts
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
+import {showToast} from "vant";
 
 export const useWebSocketStore = defineStore('websocket', () => {
     const message = ref('No message received');
@@ -22,6 +23,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
         ws.onmessage = (event) => {
             message.value = event.data;
+            console.log('Received message:', event.data);
         };
 
         ws.onerror = (error) => {
@@ -65,6 +67,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
     const scheduleReconnect = (url: string, token: string) => {
         if (reconnectTimeout) {
+            showToast({
+                message: '网络异常...',
+                type: 'fail',
+                duration: 2 * 1000
+            })
             clearTimeout(reconnectTimeout);
         }
         reconnectTimeout = setTimeout(() => connectWebSocket(url, token), RECONNECT_INTERVAL);
