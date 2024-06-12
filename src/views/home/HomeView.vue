@@ -14,11 +14,11 @@
             <van-image round class="user-item-img" :src="item.avatar"/>
             <div class="user-item-container">
               <div class="user-info">
-                <span class="name">{{ item.name }}</span>
-                <span class="message">{{ item.userId }}</span>
+                <span class="name">{{ item.username }}</span>
+<!--                <span class="message">{{ item.id }}</span>-->
               </div>
               <div class="other-info">
-                <span class="time">{{ item.time }}</span>
+                <span class="time">{{ item.created_at }}</span>
               </div>
             </div>
           </div>
@@ -33,39 +33,38 @@
 
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {onMounted, onUnmounted} from "vue";
+import {onMounted, onUnmounted, reactive} from "vue";
 import {useMenuTab} from "@/stores/modules/MenuTab";
-import { useWebSocketStore } from '@/stores/websocketStore';
+import {useWebSocketStore} from '@/stores/websocketStore';
+
+import {getFriendList} from '@/api/user'
 
 const websocketStore = useWebSocketStore();
 
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
-const friendList = [{
-  name: "小飞飞",
-  avatar: "https://avatars.githubusercontent.com/u/101162076",
-  userId: 2,
-  time: "2022-12-12 12:12:12",
-}, {
-  name: "Peppa",
-  avatar: "https://avatars.githubusercontent.com/u/12712884",
-  userId: 4,
-  time: "2022-12-12 12:12:12",
-}]
+const friendList = reactive([])
 
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: {targetUser: item}
+    state: {targetUser: { id: item.id, username: item.username, avatar: item.avatar }}
   })
 }
 
 onMounted(() => {
-  const token =localStorage.getItem("token")
-  if(!websocketStore.isConnected && token) {
+  const token = localStorage.getItem("token")
+  if (!websocketStore.isConnected && token) {
     websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token);
   }
+
+  getFriendList().then((res: any) => {
+    if (Array.isArray(res.data.list)) {
+      Object.assign(friendList, res.data.list)
+    }
+  })
+
 })
 
 

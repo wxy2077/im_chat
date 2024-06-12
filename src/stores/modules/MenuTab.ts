@@ -6,7 +6,6 @@ export const useMenuTab = defineStore('useMenuTab', {
 
     state: () => {
         return {
-            count: 991,
             showMenu: false,
         }
     },

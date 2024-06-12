@@ -3,7 +3,7 @@
     <van-nav-bar
         fixed
         placeholder
-        :title="targetUser.name"
+        :title="targetUser.username"
         right-text="..."
         left-arrow
         @click-left="goBack"
@@ -12,9 +12,9 @@
     <!--    内容 -->
     <div class="chat-content">
       <template v-for="(item, index) in messageList" :key="index">
-        <ChatItem :avatar="item.isRight ? user.avatar : targetUser.avatar"
-                  :message="item.message"
-                  :isRight="item.isRight">
+        <ChatItem :avatar="item.sender_user_id === user.id ? user.avatar : targetUser.avatar"
+                  :content="item.content"
+                  :isRight="item.sender_user_id === user.id">
         </ChatItem>
       </template>
     </div>
@@ -27,11 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from 'vue';
+import {onMounted, reactive, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import ChatItem from "./comps/ChatItem.vue";
 import BottomInput from "./comps/BottomInput.vue";
 import {useWebSocketStore} from '@/stores/websocketStore';
+import {getMessage} from '@/api/user'
 
 const websocketStore = useWebSocketStore();
 const router = useRouter();
@@ -41,7 +42,10 @@ const goBack = function () {
   router.go(-1);
 };
 
-const user = ref({avatar: ''});
+const user = ref({id: 0, avatar: ''});
+
+const messageList = reactive([{sender_user_id: 0, content: ''}])
+
 
 onMounted(() => {
   const token = localStorage.getItem("token")
@@ -52,28 +56,27 @@ onMounted(() => {
   if (userData) {
     user.value = JSON.parse(userData);
   }
+
+  getMessage({friend_user_id: targetUser.id}).then((res: any) => {
+    if (Array.isArray(res.data.list)) {
+      Object.assign(messageList, res.data.list)
+    }
+  })
 })
-
-
-const messageList = reactive([
-  {
-    isRight: true,
-    message: 'hello11'
-  },
-  {
-    isRight: false,
-    message: 'hello22'
-  }
-])
 
 const sendMsg = (msg: string) => {
   messageList.push({
-    isRight: true,
-    message: msg
+    sender_user_id: user.value.id,
+    content: msg
   })
-  let data = {content_type: 1, content: msg}
+  let data = {content_type: 1, content: msg, sender_user_id: user.value.id, receiver_user_id: targetUser.id}
   websocketStore.sendMessage(JSON.stringify(data))
 }
+
+watch(() => websocketStore.message, (newMessage) => {
+      messageList.push(JSON.parse(newMessage));
+    }
+);
 
 
 </script>

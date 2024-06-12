@@ -1,7 +1,7 @@
 <template>
   <div class="chat-item" :class="{ 'chat-item-right': isRight }">
     <img :src="avatar" class="avatar">
-    <div class="chat-message" :class="{'chat-message-right': isRight}">{{ message }}</div>
+    <div class="chat-message" :class="{'chat-message-right': isRight}">{{ content }}</div>
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 
 defineProps({
   avatar: String,
-  message: String,
+  content: String,
   isRight: {
     type: Boolean,
     default: false
