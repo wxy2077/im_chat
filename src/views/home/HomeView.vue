@@ -15,7 +15,7 @@
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
-<!--                <span class="message">{{ item.id }}</span>-->
+                <span class="message"> Hi, How was you today?</span>
               </div>
               <div class="other-info">
                 <span class="time">{{ item.created_at }}</span>
@@ -44,7 +44,7 @@ const websocketStore = useWebSocketStore();
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
-const friendList = reactive([])
+const friendList = reactive([{avatar: '', username: '', created_at: ''}])
 
 const toChart = (item: any) => {
   router.push({
@@ -107,7 +107,7 @@ onUnmounted(() => {
 
 .user-info > .name {
   position: relative;
-  top: -5px;
+  top: -3px;
 }
 
 .user-info > .message {
