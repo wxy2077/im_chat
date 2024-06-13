@@ -1,6 +1,8 @@
 <template>
   <div class="index">
     <van-nav-bar fixed placeholder title="聊天" right-text="+" />
+    <van-search v-model="keyword" placeholder="搜索" />
+
     <div class="user-list">
       <template v-for="(item, index) in friendList" :key="index">
         <van-swipe-cell>
@@ -9,9 +11,9 @@
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
-                <span class="message" v-if="item.content && item.content.length > 12"
-                  >{{ item.content.slice(0, 12) }}...</span
-                >
+                <span class="message" v-if="item.content && item.content.length > 12">
+                  {{ item.content.slice(0, 12) }}...
+                </span>
                 <span class="message" v-else>{{ item.content }}</span>
               </div>
               <div class="other-info">
@@ -35,11 +37,11 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { onMounted, onUnmounted, reactive, watch } from 'vue'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+
 import { useMenuTab } from '@/stores/modules/MenuTab'
 import { useWebSocketStore } from '@/stores/websocketStore'
 import DataFormat from '@/components/common/DataFormat.vue'
-
 import { getFriendList } from '@/api/user'
 
 const websocketStore = useWebSocketStore()
@@ -47,6 +49,7 @@ const websocketStore = useWebSocketStore()
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
+const keyword = ref('')
 const friendList = reactive([{ id: '', avatar: '', username: '', created_at: '', content: '' }])
 
 const toChart = (item: any) => {
