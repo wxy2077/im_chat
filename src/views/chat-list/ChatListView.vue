@@ -1,21 +1,18 @@
 <template>
   <div class="index">
-    <van-nav-bar
-        fixed
-        placeholder
-        title="聊天"
-        right-text="+"
-        left-arrow
-    />
+    <van-nav-bar fixed placeholder title="聊天" right-text="+" />
     <div class="user-list">
       <template v-for="(item, index) in friendList" :key="index">
         <van-swipe-cell>
           <div class="user-item" @click="toChart(item)">
-            <van-image round class="user-item-img" :src="item.avatar"/>
+            <van-image round class="user-item-img" :src="item.avatar" />
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
-                <span class="message"> Hi, How was you today?</span>
+                <span class="message" v-if="item.content && item.content.length > 12"
+                  >{{ item.content.slice(0, 12) }}...</span
+                >
+                <span class="message" v-else>{{ item.content }}</span>
               </div>
               <div class="other-info">
                 <span class="time">{{ item.created_at }}</span>
@@ -23,7 +20,7 @@
             </div>
           </div>
           <template #right>
-            <van-button style="height: 100%" square type="danger" text="删除"/>
+            <van-button style="height: 100%" square type="danger" text="删除" />
           </template>
         </van-swipe-cell>
       </template>
@@ -32,31 +29,34 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-import {onMounted, onUnmounted, reactive} from "vue";
-import {useMenuTab} from "@/stores/modules/MenuTab";
-import {useWebSocketStore} from '@/stores/websocketStore';
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted, onUnmounted, reactive, watch } from 'vue'
+import { useMenuTab } from '@/stores/modules/MenuTab'
+import { useWebSocketStore } from '@/stores/websocketStore'
 
-import {getFriendList} from '@/api/user'
+import { getFriendList } from '@/api/user'
 
-const websocketStore = useWebSocketStore();
+const websocketStore = useWebSocketStore()
 
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
-const friendList = reactive([{avatar: '', username: '', created_at: ''}])
+const friendList = reactive([{ id: '', avatar: '', username: '', created_at: '', content: '' }])
 
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: {targetUser: { id: item.id, username: item.username, avatar: item.avatar }}
+    state: { targetUser: { id: item.id, username: item.username, avatar: item.avatar } }
   })
 }
 
 onMounted(() => {
-  const token = localStorage.getItem("token")
+  menuTabBar.active = useRoute().path.slice(1)
+  menuTabBar.transShowMenu()
+
+  const token = localStorage.getItem('token')
   if (!websocketStore.isConnected && token) {
-    websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token);
+    websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token)
   }
 
   getFriendList().then((res: any) => {
@@ -64,22 +64,27 @@ onMounted(() => {
       Object.assign(friendList, res.data.list)
     }
   })
-
 })
 
+watch(
+  () => websocketStore.message,
+  (newMessage) => {
+    let msg = JSON.parse(newMessage)
+    friendList.forEach((friend, index) => {
+      if (friend.id === msg.sender_user_id) {
+        friend.content = msg.content
+      }
+    })
+  }
+)
 
-onMounted(() => {
-  menuTabBar.transShowMenu()
-})
 
 onUnmounted(() => {
   menuTabBar.transShowMenu()
 })
-
 </script>
 
 <style scoped>
-
 .user-item {
   height: 70px;
   display: flex;
@@ -106,13 +111,15 @@ onUnmounted(() => {
 }
 
 .user-info > .name {
-  position: relative;
-  top: -3px;
+  font-family: -apple-system;
+  margin-top: -13px;
 }
 
 .user-info > .message {
   font-size: 14px;
   color: #909497;
+  position: relative;
+  bottom: -10px;
 }
 
 .user-item-container > .other-info {
@@ -124,6 +131,4 @@ onUnmounted(() => {
   font-size: 14px;
   margin-right: 5px;
 }
-
-
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MenuTabBar from './components/common/MenuTabBar.vue';
+import MenuTabBar from './components/common/MenuTabBar.vue'
 </script>
 
 <template>

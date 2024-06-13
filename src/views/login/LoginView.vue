@@ -3,34 +3,30 @@
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
-            v-model="form.username"
-            name="用户名"
-            label="用户名"
-            placeholder="用户名"
-            :rules="[{ required: true, message: '请填写用户名' }]"
+          v-model="form.username"
+          name="用户名"
+          label="用户名"
+          placeholder="用户名"
+          :rules="[{ required: true, message: '请填写用户名' }]"
         />
         <van-field
-            v-model="form.password"
-            type="password"
-            name="密码"
-            label="密码"
-            placeholder="密码"
-            :rules="[{ required: true, message: '请填写密码' }]"
+          v-model="form.password"
+          type="password"
+          name="密码"
+          label="密码"
+          placeholder="密码"
+          :rules="[{ required: true, message: '请填写密码' }]"
         />
       </van-cell-group>
-      <div style="margin: 16px;">
-        <van-button round block type="primary" native-type="submit">
-          登陆
-        </van-button>
+      <div style="margin: 16px">
+        <van-button round block type="primary" native-type="submit"> 登陆 </van-button>
       </div>
     </van-form>
-
   </div>
 </template>
 
 <style lang="scss">
-
-.login-container{
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -39,46 +35,44 @@
 </style>
 
 <script setup lang="ts">
-import {reactive, ref} from 'vue'
-import {userLogin} from '@/api/user'
-import {useRouter} from 'vue-router'
-import {useUserInfo} from "@/stores/modules/UserInfo";
+import { reactive, ref } from 'vue'
+import { userLogin } from '@/api/user'
+import { useRouter } from 'vue-router'
+import { useUserInfo } from '@/stores/modules/UserInfo'
 
 const userInfo = useUserInfo()
 
 const router = useRouter()
 
-const formRef = ref(null);
+const formRef = ref(null)
 
 const form = reactive({
   username: '',
-  password: '',
-});
-
+  password: ''
+})
 
 const loading = ref(false)
 
 const onSubmit = async () => {
   try {
-    const response = await userLogin(null, { username: form.username, password: form.password });
+    const response = await userLogin(null, { username: form.username, password: form.password })
 
     if (response.success) {
       // 将 token 存储在 localStorage
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('token', response.data.token)
 
       await userInfo.fetchUserInfo()
 
       // 跳转到 '/home'
-      await router.push('/home');
+      await router.push('/chat-list')
     } else {
       // 处理其他响应码的情况
-      console.error("Login failed with code:", response.success);
+      console.error('Login failed with code:', response.success)
     }
   } catch (error) {
-    console.error("Login request failed:", error);
+    console.error('Login request failed:', error)
 
     return
   }
-};
-
+}
 </script>

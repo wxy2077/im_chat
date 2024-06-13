@@ -1,33 +1,26 @@
 <template>
   <div class="MenuTabBar" v-show="menuTabBar.showMenu">
-    <van-tabbar
-        placeholder
-        v-model="active"
-        @change="changeMenu"
-    >
-      <van-tabbar-item name="chat" icon="chat-o">聊天</van-tabbar-item>
-      <van-tabbar-item name="friends" icon="friends-o">好友</van-tabbar-item>
+    <van-tabbar placeholder v-model="menuTabBar.active" @change="changeMenu">
+      <van-tabbar-item name="chat-list" icon="chat-o">聊天</van-tabbar-item>
+      <van-tabbar-item name="friend" icon="friends-o">好友</van-tabbar-item>
       <van-tabbar-item name="search" icon="search">发现</van-tabbar-item>
-      <van-tabbar-item name="home" icon="wap-home-o">主页</van-tabbar-item>
+      <van-tabbar-item name="profile" icon="wap-home-o">我</van-tabbar-item>
     </van-tabbar>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 
-import {ref} from "vue";
+import { useMenuTab } from '@/stores/modules/MenuTab'
 
-import {useMenuTab} from "@/stores/modules/MenuTab";
-
+const router = useRouter()
 const menuTabBar = useMenuTab()
 
-const active = ref('chat');
-
 const changeMenu = (name: string) => {
-  active.value = name
+  menuTabBar.active = name
+  router.push('/' + name)
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

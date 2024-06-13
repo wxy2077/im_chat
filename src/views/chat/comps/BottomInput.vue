@@ -1,29 +1,17 @@
 <template>
   <div class="bottom-input-container">
-    <van-field
-        v-model="inputValue"
-        placeholder="Type a message"
-        right-icon="send"
-        clearable
-    />
-    <van-button
-        @click="sendMsg"
-        size="small"
-        type="primary"
-        style="width: 50px;"
-    >发送
-    </van-button>
+    <van-field v-model="inputValue" placeholder="" right-icon="send" clearable />
+    <van-button @click="sendMsg" size="small" type="primary" style="width: 50px">发送 </van-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from 'vue'
 
 import { defineEmits } from 'vue'
 const emit = defineEmits(['sendMsg'])
 
 const inputValue = ref('')
-
 
 const sendMsg = () => {
   if (inputValue.value.trim()) {
@@ -31,7 +19,6 @@ const sendMsg = () => {
     inputValue.value = ''
   }
 }
-
 </script>
 
 <style scoped>
@@ -48,10 +35,8 @@ const sendMsg = () => {
   z-index: 1000;
 }
 
-
 body.keyboard-open .bottom-input-container {
   position: absolute;
   bottom: auto;
 }
-
 </style>
