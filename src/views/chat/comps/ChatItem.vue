@@ -1,7 +1,9 @@
 <template>
   <div class="chat-item" :class="{ 'chat-item-right': isRight }">
     <img v-if="content" :src="avatar" class="avatar" />
-    <div v-if="content" class="chat-message" :class="{ 'chat-message-right': isRight }">{{ content }}</div>
+    <div v-if="content" class="chat-message" :class="{ 'chat-message-right': isRight }">
+      {{ content }}
+    </div>
   </div>
 </template>
 

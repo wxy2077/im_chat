@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {useMenuTab} from '@/stores/modules/MenuTab'
-import {onMounted, onUnmounted} from "vue";
-import {useRoute} from "vue-router";
+import { useMenuTab } from '@/stores/modules/MenuTab'
+import { onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 const menuTabBar = useMenuTab()
 
 onMounted(() => {
@@ -12,15 +12,10 @@ onMounted(() => {
 onUnmounted(() => {
   menuTabBar.transShowMenu()
 })
-
 </script>
 
 <template>
-  <div>
-    TODO 我的主页
-  </div>
+  <div>TODO 我的主页</div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
