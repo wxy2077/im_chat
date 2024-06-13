@@ -62,7 +62,7 @@ onUnmounted(() => {
       <van-cell v-for="(item, key) in groups" :key="key">
         <template #right-icon>
           <van-image round class="user-item-img" :src="item.avatar"/>
-          <span style="pannding-top: 5px; ">{{ item.username }}</span>
+          <span class="user-item-username" >{{ item.username }}</span>
         </template>
       </van-cell>
     </template>
@@ -74,5 +74,8 @@ onUnmounted(() => {
   height: 40px;
   margin-right: 10px;
   border-radius: 10px;
+}
+.user-item-username{
+  line-height: 40px;
 }
 </style>

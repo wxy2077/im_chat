@@ -1,26 +1,30 @@
 <template>
   <div class="index">
-    <van-nav-bar fixed placeholder title="聊天" right-text="+" />
+    <van-nav-bar fixed placeholder title="聊天" right-text="+"/>
     <div class="user-list">
       <template v-for="(item, index) in friendList" :key="index">
         <van-swipe-cell>
           <div class="user-item" @click="toChart(item)">
-            <van-image round class="user-item-img" :src="item.avatar" />
+            <van-image round class="user-item-img" :src="item.avatar"/>
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
                 <span class="message" v-if="item.content && item.content.length > 12"
-                  >{{ item.content.slice(0, 12) }}...</span
+                >{{ item.content.slice(0, 12) }}...</span
                 >
                 <span class="message" v-else>{{ item.content }}</span>
               </div>
               <div class="other-info">
-                <span class="time">{{ item.created_at }}</span>
+                <span class="time">
+                  <DataFormat :date="new Date(item.created_at)"
+                              :options="{ showTime: true, showWeek: false }"></DataFormat>
+
+                </span>
               </div>
             </div>
           </div>
           <template #right>
-            <van-button style="height: 100%" square type="danger" text="删除" />
+            <van-button style="height: 100%" square type="danger" text="删除"/>
           </template>
         </van-swipe-cell>
       </template>
@@ -29,24 +33,25 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
-import { onMounted, onUnmounted, reactive, watch } from 'vue'
-import { useMenuTab } from '@/stores/modules/MenuTab'
-import { useWebSocketStore } from '@/stores/websocketStore'
+import {useRoute, useRouter} from 'vue-router'
+import {onMounted, onUnmounted, reactive, watch} from 'vue'
+import {useMenuTab} from '@/stores/modules/MenuTab'
+import {useWebSocketStore} from '@/stores/websocketStore'
+import DataFormat from "@/components/common/DataFormat.vue";
 
-import { getFriendList } from '@/api/user'
+import {getFriendList} from '@/api/user'
 
 const websocketStore = useWebSocketStore()
 
 const menuTabBar = useMenuTab()
 const router = useRouter()
 
-const friendList = reactive([{ id: '', avatar: '', username: '', created_at: '', content: '' }])
+const friendList = reactive([{id: '', avatar: '', username: '', created_at: '', content: ''}])
 
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: { targetUser: { id: item.id, username: item.username, avatar: item.avatar } }
+    state: {targetUser: {id: item.id, username: item.username, avatar: item.avatar}}
   })
 }
 
@@ -67,15 +72,15 @@ onMounted(() => {
 })
 
 watch(
-  () => websocketStore.message,
-  (newMessage) => {
-    let msg = JSON.parse(newMessage)
-    friendList.forEach((friend, index) => {
-      if (friend.id === msg.sender_user_id) {
-        friend.content = msg.content
-      }
-    })
-  }
+    () => websocketStore.message,
+    (newMessage) => {
+      let msg = JSON.parse(newMessage)
+      friendList.forEach((friend, index) => {
+        if (friend.id === msg.sender_user_id) {
+          friend.content = msg.content
+        }
+      })
+    }
 )
 
 
