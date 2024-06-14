@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { TOKEN } from '@/utils/globalConsts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,12 +48,12 @@ const router = createRouter({
 
 // 路由拦截
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(TOKEN)
 
   if (to.path === '/login') {
     next()
   } else {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem(TOKEN)) {
       next()
     } else {
       next('/login')

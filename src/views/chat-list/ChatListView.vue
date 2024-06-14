@@ -1,6 +1,10 @@
 <template>
   <div class="index">
-    <van-nav-bar fixed placeholder title="聊天" right-text="+" />
+    <van-nav-bar fixed placeholder title="聊天">
+      <template #right>
+        <van-icon name="add-o" size="18px" color="black" />
+      </template>
+    </van-nav-bar>
     <van-search v-model="keyword" placeholder="搜索" />
 
     <div class="user-list">
@@ -11,13 +15,13 @@
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
-                <span class="message" v-if="item.content && item.content.length > 12">
-                  {{ item.content.slice(0, 12) }}...
+                <span class="message" v-if="item.content && item.content.length > 20">
+                  {{ item.content.slice(0, 20) }}...
                 </span>
                 <span class="message" v-else>{{ item.content }}</span>
               </div>
               <div class="other-info">
-                <span class="time">
+                <span class="time" v-if="item.created_at">
                   <DataFormat
                     :date="new Date(item.created_at)"
                     :options="{ showTime: true, showWeek: false }"
@@ -27,7 +31,13 @@
             </div>
           </div>
           <template #right>
-            <van-button style="height: 100%" square type="danger" text="删除" />
+            <van-button
+              style="height: 100%"
+              square
+              type="danger"
+              @click="deleteFriend(item.id)"
+              text="删除"
+            />
           </template>
         </van-swipe-cell>
       </template>
@@ -42,7 +52,8 @@ import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useMenuTab } from '@/stores/modules/MenuTab'
 import { useWebSocketStore } from '@/stores/websocketStore'
 import DataFormat from '@/components/common/DataFormat.vue'
-import { getFriendList } from '@/api/user'
+import { type UserInfo } from '@/types/users'
+import { FRIEND_LIST_KEY, TOKEN } from '@/utils/globalConsts'
 
 const websocketStore = useWebSocketStore()
 
@@ -50,7 +61,7 @@ const menuTabBar = useMenuTab()
 const router = useRouter()
 
 const keyword = ref('')
-const friendList = reactive([{ id: '', avatar: '', username: '', created_at: '', content: '' }])
+const friendList = reactive<UserInfo[]>([])
 
 const toChart = (item: any) => {
   router.push({
@@ -63,32 +74,54 @@ onMounted(() => {
   menuTabBar.active = useRoute().path.slice(1)
   menuTabBar.transShowMenu()
 
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(TOKEN)
   if (!websocketStore.isConnected && token) {
     websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token)
   }
 
-  getFriendList().then((res: any) => {
-    if (Array.isArray(res.data.list)) {
-      Object.assign(friendList, res.data.list)
-    }
-  })
+  const storedFriendList = localStorage.getItem(FRIEND_LIST_KEY)
+  if (storedFriendList) {
+    const friends: UserInfo[] = JSON.parse(storedFriendList)
+    Object.assign(friendList, friends)
+  }
 })
 
 watch(
   () => websocketStore.message,
   (newMessage) => {
     let msg = JSON.parse(newMessage)
+    console.log(msg)
+    let isExist: boolean = false
     friendList.forEach((friend, index) => {
       if (friend.id === msg.sender_user_id) {
         friend.content = msg.content
+        isExist = true
       }
     })
+    if (!isExist) {
+      let newFriend: UserInfo = {
+        id: msg.sender_user_id,
+        username: msg.sender_username,
+        avatar: msg.avatar,
+        content: msg.content,
+        created_at: msg.created_at
+      }
+      friendList.unshift(newFriend)
+    }
   }
 )
 
+const deleteFriend = (id: number) => {
+  friendList.splice(
+    friendList.findIndex((item) => item.id === id),
+    1
+  )
+}
+
 onUnmounted(() => {
   menuTabBar.transShowMenu()
+
+  localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(friendList))
 })
 </script>
 

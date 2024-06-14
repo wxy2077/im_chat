@@ -23,7 +23,14 @@ let firstNameList: Record<string, any[]> = reactive({})
 const toUserProfile = (item: any) => {
   router.push({
     name: 'user-profile',
-    state: { targetUser: { id: item.id, username: item.username, avatar: item.avatar, account: item.account } }
+    state: {
+      targetUser: {
+        id: item.id,
+        username: item.username,
+        avatar: item.avatar,
+        account: item.account
+      }
+    }
   })
 }
 
@@ -58,7 +65,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <van-nav-bar fixed placeholder title="好友" right-text="+" />
+  <van-nav-bar fixed placeholder title="好友">
+    <template #right>
+      <van-icon name="add-o" size="18px" color="black" />
+    </template>
+  </van-nav-bar>
   <van-search v-model="keyword" placeholder="搜索" />
   <van-index-bar :index-list="alphabetList">
     <van-cell-group>

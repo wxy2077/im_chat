@@ -29,12 +29,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ChatItem from './comps/ChatItem.vue'
 import BottomInput from './comps/BottomInput.vue'
 import { useWebSocketStore } from '@/stores/websocketStore'
 import { getMessage } from '@/api/user'
+import { type UserInfo } from '@/types/users'
+import { type Message } from '@/types/message'
+
+import { formatDate } from '@/utils/dateFormat'
+import { FRIEND_LIST_KEY, TOKEN, USER } from '@/utils/globalConsts'
 
 const websocketStore = useWebSocketStore()
 const router = useRouter()
@@ -44,16 +49,16 @@ const goBack = function () {
   router.go(-1)
 }
 
-const user = ref({ id: 0, avatar: '' })
+const user = ref<UserInfo>({} as UserInfo)
 
-const messageList = reactive([{ sender_user_id: 0, content: '' }])
+const messageList = reactive<Message[]>([])
 
 onMounted(() => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(TOKEN)
   if (!websocketStore.isConnected && token) {
     websocketStore.connectWebSocket(import.meta.env.VITE_BASE_WS, token)
   }
-  const userData = localStorage.getItem('user')
+  const userData = localStorage.getItem(USER)
   if (userData) {
     user.value = JSON.parse(userData)
   }
@@ -66,16 +71,17 @@ onMounted(() => {
 })
 
 const sendMsg = (msg: string) => {
-  messageList.push({
+  let data: Message = {
+    avatar: user.value.avatar,
     sender_user_id: user.value.id,
-    content: msg
-  })
-  let data = {
-    content_type: 1,
+    sender_username: user.value.username,
+    receiver_target_id: targetUser.id,
     content: msg,
-    sender_user_id: user.value.id,
-    receiver_user_id: targetUser.id
+    content_type: 1,
+    message_type: 1,
+    created_at: formatDate(new Date())
   }
+  messageList.push(data)
   websocketStore.sendMessage(JSON.stringify(data))
 }
 
@@ -85,11 +91,49 @@ watch(
     messageList.push(JSON.parse(newMessage))
   }
 )
+
+onUnmounted(() => {
+  const friend: UserInfo = {
+    content: '',
+    created_at: '',
+    id: targetUser.id,
+    username: targetUser.username,
+    avatar: targetUser.avatar
+  }
+
+  if (messageList.length > 0) {
+    let lastMsg = messageList[messageList.length - 1]
+    friend.content =
+      lastMsg.content && lastMsg.content.length < 20
+        ? lastMsg.content
+        : lastMsg.content.slice(0, 20) + '...'
+    friend.created_at = lastMsg.created_at
+  } else {
+    friend.created_at = formatDate(new Date())
+  }
+
+  const storedFriendList = localStorage.getItem(FRIEND_LIST_KEY)
+  if (storedFriendList) {
+    const friendList: UserInfo[] = JSON.parse(storedFriendList)
+
+    const index = friendList.findIndex((item) => item.id === targetUser.id)
+    if (index !== -1) {
+      friendList.splice(index, 1)
+    }
+    friendList.unshift(friend)
+    localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(friendList))
+  } else {
+    const newFriendList: UserInfo[] = []
+    newFriendList.push(friend)
+
+    localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(newFriendList))
+  }
+})
 </script>
 
 <style scoped>
 .chat-content {
-  margin-bottom: 55px;
+  margin-bottom: 100px;
 }
 
 .chat-user-panel {

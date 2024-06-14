@@ -39,19 +39,16 @@ import { reactive, ref } from 'vue'
 import { userLogin } from '@/api/user'
 import { useRouter } from 'vue-router'
 import { useUserInfo } from '@/stores/modules/UserInfo'
+import { TOKEN } from '@/utils/globalConsts'
 
 const userInfo = useUserInfo()
 
 const router = useRouter()
 
-const formRef = ref(null)
-
 const form = reactive({
   username: '',
   password: ''
 })
-
-const loading = ref(false)
 
 const onSubmit = async () => {
   try {
@@ -59,7 +56,7 @@ const onSubmit = async () => {
 
     if (response.success) {
       // 将 token 存储在 localStorage
-      localStorage.setItem('token', response.data.token)
+      localStorage.setItem(TOKEN, response.data.token)
 
       await userInfo.fetchUserInfo()
 

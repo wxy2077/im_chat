@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
@@ -8,12 +8,16 @@ const targetUser = history.state.targetUser
 const goBack = function () {
   router.go(-1)
 }
+
+const goToChat = function () {
+  router.push({ name: 'chat', state: { targetUser } })
+}
 </script>
 
 <template>
-  <van-nav-bar fixed placeholder right-text="+" left-arrow @click-left="goBack"/>
+  <van-nav-bar fixed placeholder right-text="+" left-arrow @click-left="goBack" />
   <div class="user-profile">
-    <van-image round class="user-item-img" :src="targetUser.avatar"/>
+    <van-image round class="user-item-img" :src="targetUser.avatar" />
     <div class="user-info">
       <p class="user-name">昵称: {{ targetUser.username }}</p>
       <p class="user-account">账号: {{ targetUser.account }}</p>
@@ -29,9 +33,9 @@ const goBack = function () {
     <van-cell title="更多信息" is-link />
   </van-cell-group>
 
-  <van-button class="link-user" @click="router.push({ name: 'chat', state: { targetUser } })" block>
-    <van-icon name="chat-o" size="15" />  发消息</van-button>
-
+  <van-button class="link-user" @click="goToChat" block>
+    <van-icon name="chat-o" size="15" /> 发消息</van-button
+  >
 </template>
 
 <style scoped>
@@ -61,7 +65,7 @@ const goBack = function () {
   margin: 5px;
   font-size: medium;
 }
-.cell-group{
+.cell-group {
   margin-bottom: 10px;
 }
 .link-user {
