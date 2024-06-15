@@ -15,7 +15,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>TODO搜索</div>
+  <div class="search">
+    <van-nav-bar fixed placeholder title="发现" />
+    <van-cell icon="contact-o" title="朋友圈" is-link color="" />
+  </div>
 </template>
 
 <style scoped></style>
