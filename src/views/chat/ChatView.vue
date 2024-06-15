@@ -115,10 +115,6 @@ watch(
 watch(
   messageList,
   () => {
-    if (page > 2) {
-      return
-    }
-
     nextTick(() => {
       if (chatContainer.value) {
         chatContainer.value.scrollTop = chatContainer.value.scrollHeight
