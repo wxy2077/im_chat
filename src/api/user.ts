@@ -4,12 +4,12 @@ export function userLogin(params?: any, data?: any) {
   return request({ url: '/api/v1/user/login', method: 'post', params, data })
 }
 
-export function userInfo() {
-  return request({ url: '/api/v1/user/info', method: 'get' })
+export function userInfo(params?: any) {
+  return request({ url: '/api/v1/user/info', method: 'get', params })
 }
 
 export function getFriendList() {
-  return request({ url: '/api/v1/user/friend', method: 'get' })
+  return request({ url: '/api/v1/user/friend-list', method: 'get' })
 }
 
 export function getMessage(params?: any) {

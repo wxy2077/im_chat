@@ -13,9 +13,11 @@
     <div class="chat-content" ref="chatContainer" @scroll="onScroll">
       <template v-for="(item, index) in messageList" :key="index">
         <ChatItem
+          :id="item.sender_user_id"
           :avatar="item.sender_user_id === user.id ? user.avatar : targetUser.avatar"
           :content="item.content"
           :isRight="item.sender_user_id === user.id"
+          @toUserProfile="toUserProfile"
         >
         </ChatItem>
       </template>
@@ -47,6 +49,17 @@ const targetUser = history.state.targetUser
 
 const goBack = function () {
   router.go(-1)
+}
+
+const toUserProfile = (id: number) => {
+  router.push({
+    name: 'user-profile',
+    state: {
+      targetUser: {
+        id: id,
+      }
+    }
+  })
 }
 
 const user = ref<UserInfo>({} as UserInfo)

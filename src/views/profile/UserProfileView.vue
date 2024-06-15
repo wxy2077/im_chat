@@ -1,9 +1,27 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import {onMounted, ref} from "vue";
+import {userInfo} from "@/api/user";
+import type {UserInfo} from "@/types/users";
 
 const router = useRouter()
 
-const targetUser = history.state.targetUser
+let targetUser = history.state.targetUser
+
+const user = ref<UserInfo>({} as UserInfo)
+
+onMounted(() => {
+  user.value = targetUser
+
+  if (!targetUser.username) {
+    userInfo({ friend_user_id: targetUser.id }).then((res: any) => {
+      console.log(res);
+      if (res.data) {
+        user.value = res.data
+      }
+    })
+  }
+})
 
 const goBack = function () {
   router.go(-1)
@@ -17,10 +35,10 @@ const goToChat = function () {
 <template>
   <van-nav-bar fixed placeholder right-text="+" left-arrow @click-left="goBack" />
   <div class="user-profile">
-    <van-image round class="user-item-img" :src="targetUser.avatar" />
+    <van-image round class="user-item-img" :src="user.avatar" />
     <div class="user-info">
-      <p class="user-name">昵称: {{ targetUser.username }}</p>
-      <p class="user-account">账号: {{ targetUser.account }}</p>
+      <p class="user-name">昵称: {{ user.username }}</p>
+      <p class="user-account">账号: {{ user.account }}</p>
     </div>
   </div>
   <van-cell-group class="cell-group">

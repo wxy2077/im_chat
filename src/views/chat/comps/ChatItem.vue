@@ -1,6 +1,6 @@
 <template>
   <div class="chat-item" :class="{ 'chat-item-right': isRight }">
-    <img v-if="content" :src="avatar" class="avatar" />
+    <img v-if="content" :src="avatar" class="avatar" @click="toUserProfile" />
     <div v-if="content" class="chat-message" :class="{ 'chat-message-right': isRight }">
       {{ content }}
     </div>
@@ -8,14 +8,20 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  avatar: String,
-  content: String,
-  isRight: {
-    type: Boolean,
-    default: false
-  }
-})
+
+import { defineEmits } from 'vue'
+const emit = defineEmits(['toUserProfile'])
+
+const props = defineProps<{
+  id: number;
+  avatar: string;
+  content: string;
+  isRight?: boolean;
+}>();
+
+const toUserProfile =() => {
+  emit('toUserProfile', props.id)
+}
 </script>
 
 <style scoped>
