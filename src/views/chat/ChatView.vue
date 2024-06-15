@@ -10,7 +10,7 @@
     ></van-nav-bar>
 
     <!--    内容 -->
-    <div class="chat-content">
+    <div class="chat-content" ref="chatContainer" @scroll="onScroll">
       <template v-for="(item, index) in messageList" :key="index">
         <ChatItem
           :avatar="item.sender_user_id === user.id ? user.avatar : targetUser.avatar"
@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ChatItem from './comps/ChatItem.vue'
 import BottomInput from './comps/BottomInput.vue'
@@ -51,7 +51,12 @@ const goBack = function () {
 
 const user = ref<UserInfo>({} as UserInfo)
 
-const messageList = reactive<Message[]>([])
+const chatContainer = ref<HTMLElement | null>(null)
+
+const loading = ref(false)
+
+let messageList = reactive<Message[]>([])
+let page = 1
 
 onMounted(() => {
   const token = localStorage.getItem(TOKEN)
@@ -63,9 +68,10 @@ onMounted(() => {
     user.value = JSON.parse(userData)
   }
 
-  getMessage({ friend_user_id: targetUser.id }).then((res: any) => {
+  getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
     if (Array.isArray(res.data.list)) {
       Object.assign(messageList, res.data.list)
+      page += 1
     }
   })
 })
@@ -91,6 +97,52 @@ watch(
     messageList.push(JSON.parse(newMessage))
   }
 )
+
+// 滚动到底
+watch(
+  messageList,
+  () => {
+    if (page > 2) {
+      return
+    }
+
+    nextTick(() => {
+      if (chatContainer.value) {
+        chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+      }
+    })
+  },
+  { deep: true }
+)
+
+// 滚动加载
+const onScroll = () => {
+  if (chatContainer.value) {
+    if (chatContainer.value.scrollTop === 0 && !loading.value) {
+      loading.value = true
+
+      // 记录当前的scrollHeight
+      const previousScrollHeight = chatContainer.value.scrollHeight
+
+      getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
+        if (Array.isArray(res.data.list)) {
+          messageList.unshift(...res.data.list)
+
+          // 插入新消息后，使用 requestAnimationFrame 重新设置滚动位置
+          requestAnimationFrame(() => {
+            // 计算新的scrollTop 不至于很突兀
+            chatContainer.value!.scrollTop =
+              chatContainer.value!.scrollHeight - previousScrollHeight
+          })
+
+          // 判断是否还能继续加载
+          loading.value = res.data.pagination.totalPages <= page
+          page += 1
+        }
+      })
+    }
+  }
+}
 
 onUnmounted(() => {
   const friend: UserInfo = {
@@ -133,7 +185,8 @@ onUnmounted(() => {
 
 <style scoped>
 .chat-content {
-  margin-bottom: 100px;
+  height: calc(100vh - 110px);
+  overflow-y: auto;
 }
 
 .chat-user-panel {
