@@ -1,5 +1,10 @@
 <template>
-  <div class="login-container">
+  <div>
+
+    <div class="logo">
+      <img src="../../assets/ichat.png">
+    </div>
+    <div class="login-container ">
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
@@ -22,24 +27,30 @@
         <van-button round block type="primary" native-type="submit"> 登陆 </van-button>
       </div>
     </van-form>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50vh;
 }
 </style>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { userLogin } from '@/api/user'
-import { useRouter } from 'vue-router'
-import { useUserInfo } from '@/stores/modules/UserInfo'
-import { TOKEN } from '@/utils/globalConsts'
+import {reactive} from 'vue'
+import {userLogin} from '@/api/user'
+import {useRouter} from 'vue-router'
+import {useUserInfo} from '@/stores/modules/UserInfo'
+import {TOKEN} from '@/utils/globalConsts'
 
 const userInfo = useUserInfo()
 
@@ -52,7 +63,7 @@ const form = reactive({
 
 const onSubmit = async () => {
   try {
-    const response = await userLogin(null, { username: form.username, password: form.password })
+    const response = await userLogin(null, {username: form.username, password: form.password})
 
     if (response.success) {
       // 将 token 存储在 localStorage
