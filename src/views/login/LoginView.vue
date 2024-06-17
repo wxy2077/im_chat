@@ -28,6 +28,11 @@
       </div>
     </van-form>
     </div>
+    <div class="tip">
+      <p>账号:jay peppa qi feifei lufei wukong
+        <br> 密码都是12345
+      </p>
+    </div>
   </div>
 </template>
 
@@ -42,6 +47,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.tip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 </style>
 
@@ -58,7 +69,7 @@ const router = useRouter()
 
 const form = reactive({
   username: '',
-  password: ''
+  password: '12345'
 })
 
 const onSubmit = async () => {
@@ -71,8 +82,8 @@ const onSubmit = async () => {
 
       await userInfo.fetchUserInfo()
 
-      // 跳转到 '/home'
-      await router.push('/chat-list')
+      // 跳转到
+      await router.push('/friend')
     } else {
       // 处理其他响应码的情况
       console.error('Login failed with code:', response.success)

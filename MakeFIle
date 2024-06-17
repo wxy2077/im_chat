@@ -1,5 +1,5 @@
 build:
-	docker build -t my-vue-app-nginx .
+	docker build -t ichat-vue-app-nginx .
 
 run:
-	docker run -d -p 8080:80 --name my-vue-app my-vue-app-nginx
+	docker run -d -p 8080:80 --name ichat-vue-app ichat-vue-app-nginx
