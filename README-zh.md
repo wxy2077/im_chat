@@ -1,18 +1,18 @@
-# IM demo
+# IM 演示
 
 [中文说明](./README-zh.md) | [English](./README.md)
 
-This is an IM APP front-end code repository, using WebSocket technology
+这是一个使用WebSocket技术的前端IM APP代码仓库
 
+### 在线体验地址 
 
-### Online experience address
-
-Remember F12 Turn on console to mobile
+记得F12调成移动端模式
 
 http://chat.charmcode.cn/
 
-### Technology stack
-- Vue3 
+
+### 技术栈
+- Vue3
 - TypeScript
 - Pinia
 - VantUI
@@ -20,14 +20,14 @@ http://chat.charmcode.cn/
 - Docker + nginx
 
 
-### Backend code repository
+### 后端仓库地址
 
 [IM-Gin](https://github.com/wxy2077/net_chat)
 
-### UI screenshot
+### UI 截图
 
 <details>
-<summary>Click to expand to view</summary>
+<summary>点击展开</summary>
 
 ![chat-list](./img/chat-list.png) ![chat](./img/chat.png) ![friend](./img/friend.png)
 
