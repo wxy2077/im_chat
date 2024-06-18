@@ -37,7 +37,7 @@ import ChatItem from './comps/ChatItem.vue'
 import BottomInput from './comps/BottomInput.vue'
 import { useWebSocketStore } from '@/stores/websocketStore'
 import { getMessage } from '@/api/user'
-import { type UserInfo } from '@/types/users'
+import type { UserInfo, ChatInfoItem } from '@/types/users'
 import { type Message } from '@/types/message'
 
 import { formatDate } from '@/utils/dateFormat'
@@ -154,12 +154,15 @@ const onScroll = () => {
 }
 
 onUnmounted(() => {
-  const friend: UserInfo = {
+  const friend: ChatInfoItem = {
     content: '',
     created_at: '',
     id: targetUser.id,
     username: targetUser.username,
-    avatar: targetUser.avatar
+    avatar: targetUser.avatar,
+    content_type: 1,
+    message_type: 1,
+    unreadCount: 0
   }
 
   if (messageList.length > 0) {
@@ -175,7 +178,7 @@ onUnmounted(() => {
 
   const storedFriendList = localStorage.getItem(FRIEND_LIST_KEY)
   if (storedFriendList) {
-    const friendList: UserInfo[] = JSON.parse(storedFriendList)
+    const friendList: ChatInfoItem[] = JSON.parse(storedFriendList)
 
     const index = friendList.findIndex((item) => item.id === targetUser.id)
     if (index !== -1) {
@@ -184,7 +187,7 @@ onUnmounted(() => {
     friendList.unshift(friend)
     localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(friendList))
   } else {
-    const newFriendList: UserInfo[] = []
+    const newFriendList: ChatInfoItem[] = []
     newFriendList.push(friend)
 
     localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(newFriendList))

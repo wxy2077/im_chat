@@ -2,16 +2,16 @@
   <div class="index">
     <van-nav-bar fixed placeholder title="聊天">
       <template #right>
-        <van-icon name="add-o" size="18px" color="black" />
+        <van-icon name="add-o" size="18px" color="black"/>
       </template>
     </van-nav-bar>
-    <van-search v-model="keyword" placeholder="搜索" />
+    <van-search v-model="keyword" placeholder="搜索"/>
 
     <div class="user-list">
-      <template v-for="(item, index) in friendList" :key="index">
+      <template v-for="(item, index) in chatInfoItem" :key="index">
         <van-swipe-cell>
           <div class="user-item" @click="toChart(item)">
-            <van-image round class="user-item-img" :src="item.avatar" />
+            <van-image round class="user-item-img" :src="item.avatar"/>
             <div class="user-item-container">
               <div class="user-info">
                 <span class="name">{{ item.username }}</span>
@@ -23,8 +23,8 @@
               <div class="other-info">
                 <span class="time" v-if="item.created_at">
                   <DataFormat
-                    :date="new Date(item.created_at)"
-                    :options="{ showTime: true, showWeek: false }"
+                      :date="new Date(item.created_at)"
+                      :options="{ showTime: true, showWeek: false }"
                   ></DataFormat>
                 </span>
               </div>
@@ -32,11 +32,11 @@
           </div>
           <template #right>
             <van-button
-              style="height: 100%"
-              square
-              type="danger"
-              @click="deleteFriend(item.id)"
-              text="删除"
+                style="height: 100%"
+                square
+                type="danger"
+                @click="deleteFriend(item.id)"
+                text="删除"
             />
           </template>
         </van-swipe-cell>
@@ -46,14 +46,15 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
-import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 
-import { useMenuTab } from '@/stores/modules/MenuTab'
-import { useWebSocketStore } from '@/stores/websocketStore'
+import {useMenuTab} from '@/stores/modules/MenuTab'
+import {useWebSocketStore} from '@/stores/websocketStore'
 import DataFormat from '@/components/common/DataFormat.vue'
-import { type UserInfo } from '@/types/users'
-import { FRIEND_LIST_KEY, TOKEN } from '@/utils/globalConsts'
+import {type ChatInfoItem} from '@/types/users'
+import {FRIEND_LIST_KEY, TOKEN} from '@/utils/globalConsts'
+import {getUnreadMessage} from "@/api/user";
 
 const websocketStore = useWebSocketStore()
 
@@ -61,12 +62,12 @@ const menuTabBar = useMenuTab()
 const router = useRouter()
 
 const keyword = ref('')
-const friendList = reactive<UserInfo[]>([])
+const chatInfoItem = reactive<ChatInfoItem[]>([])
 
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: { targetUser: { id: item.id, username: item.username, avatar: item.avatar } }
+    state: {targetUser: {id: item.id, username: item.username, avatar: item.avatar}}
   })
 }
 
@@ -81,47 +82,86 @@ onMounted(() => {
 
   const storedFriendList = localStorage.getItem(FRIEND_LIST_KEY)
   if (storedFriendList) {
-    const friends: UserInfo[] = JSON.parse(storedFriendList)
-    Object.assign(friendList, friends)
+    const friends: ChatInfoItem[] = JSON.parse(storedFriendList)
+    Object.assign(chatInfoItem, friends)
   }
+
+  getUnreadMessage().then((res) => {
+    if (res.data.length > 0) {
+
+      let tempChatItemMap: { [key: number]: ChatInfoItem } = {}
+
+      res.data.forEach((item: any) => {
+        tempChatItemMap[item.sender_user.id] = {
+          id: item.sender_user.id,
+          content: item.content,
+          created_at: item.created_at,
+          username: item.sender_user.username,
+          avatar: item.sender_user.avatar,
+          content_type: item.content_type,
+          message_type: item.message_type,
+          unreadCount: item.UnreadCount
+        }
+      })
+
+      chatInfoItem.forEach((chatItem, index) => {
+        if (tempChatItemMap[chatItem.id]) {
+          if (tempChatItemMap[chatItem.id].message_type == chatItem.message_type) {
+            chatItem.content = tempChatItemMap[chatItem.id].content
+            chatItem.created_at = tempChatItemMap[chatItem.id].created_at
+            chatItem.unreadCount = tempChatItemMap[chatItem.id].unreadCount
+          }
+          delete tempChatItemMap[chatItem.id]
+        }
+      })
+      // 置顶未读消息
+      Object.values(tempChatItemMap).forEach((item) => {
+        chatInfoItem.unshift(item)
+      })
+
+    }
+  })
+
 })
 
 watch(
-  () => websocketStore.message,
-  (newMessage) => {
-    let msg = JSON.parse(newMessage)
-    console.log(msg)
-    let isExist: boolean = false
-    friendList.forEach((friend, index) => {
-      if (friend.id === msg.sender_user_id) {
-        friend.content = msg.content
-        isExist = true
+    () => websocketStore.message,
+    (newMessage) => {
+      let msg = JSON.parse(newMessage)
+
+      let isExist: boolean = false
+      chatInfoItem.forEach((chatItem, index) => {
+        if (chatItem.id === msg.sender_user_id) {
+          chatItem.content = msg.content
+          isExist = true
+        }
+      })
+      if (!isExist) {
+        let newFriend: ChatInfoItem = {
+          id: msg.sender_user_id,
+          username: msg.sender_username,
+          avatar: msg.avatar,
+          content: msg.content,
+          content_type: msg.content_type,
+          message_type: msg.message_type,
+          created_at: msg.created_at
+        }
+        chatInfoItem.unshift(newFriend)
       }
-    })
-    if (!isExist) {
-      let newFriend: UserInfo = {
-        id: msg.sender_user_id,
-        username: msg.sender_username,
-        avatar: msg.avatar,
-        content: msg.content,
-        created_at: msg.created_at
-      }
-      friendList.unshift(newFriend)
     }
-  }
 )
 
 const deleteFriend = (id: number) => {
-  friendList.splice(
-    friendList.findIndex((item) => item.id === id),
-    1
+  chatInfoItem.splice(
+      chatInfoItem.findIndex((item) => item.id === id),
+      1
   )
 }
 
 onUnmounted(() => {
   menuTabBar.transShowMenu()
 
-  localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(friendList))
+  localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(chatInfoItem))
 })
 </script>
 

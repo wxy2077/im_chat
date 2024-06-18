@@ -15,3 +15,7 @@ export function getFriendList() {
 export function getMessage(params?: any) {
   return request({ url: '/api/v1/user/message', method: 'get', params })
 }
+
+export function getUnreadMessage() {
+  return request({ url: '/api/v1/user/unread-message', method: 'get' })
+}
