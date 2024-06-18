@@ -24,6 +24,11 @@ http://chat.charmcode.cn/
 
 [IM-Gin](https://github.com/wxy2077/net_chat)
 
+### 计划待开发功能
+
+- [ ] 群组消息
+- [ ] WebRtc 视频聊天
+
 ### UI 截图
 
 <details>

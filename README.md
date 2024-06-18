@@ -24,6 +24,11 @@ http://chat.charmcode.cn/
 
 [IM-Gin](https://github.com/wxy2077/net_chat)
 
+### TODO
+
+- [ ] Group Message
+- [ ] WebRtc Video Chat
+
 ### UI screenshot
 
 <details>
