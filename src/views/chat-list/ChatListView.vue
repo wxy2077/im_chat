@@ -87,7 +87,7 @@ onMounted(() => {
   }
 
   getUnreadMessage().then((res) => {
-    if (res.data.length > 0) {
+    if (res.data?.length > 0) {
 
       let tempChatItemMap: { [key: number]: ChatInfoItem } = {}
 
@@ -170,7 +170,7 @@ onUnmounted(() => {
   height: 70px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #ebedf0;
+  border-bottom: 1px solid var(--vt-c-basecolor);
   position: relative;
 }
 
@@ -198,7 +198,7 @@ onUnmounted(() => {
 
 .user-info > .message {
   font-size: 14px;
-  color: #909497;
+  color: var(--vt-c-basecolor);
   position: relative;
   bottom: -10px;
 }
@@ -211,5 +211,8 @@ onUnmounted(() => {
 .other-info > .time {
   font-size: 14px;
   margin-right: 5px;
+}
+.van-search{
+  background-color: var(--vt-c-basecolor);
 }
 </style>

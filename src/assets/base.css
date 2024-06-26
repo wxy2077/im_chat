@@ -9,6 +9,7 @@
   --vt-c-black-mute: #282828;
 
   --vt-c-indigo: #2c3e50;
+  --vt-c-basecolor:#23d5ab;
 
   --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
   --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
@@ -19,11 +20,14 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --vt-c-gradient-background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  --vt-c-animation: gradientBG 15s ease infinite;
+  --vt-c-background-size: 400% 400%;
 }
 
 /* semantic color variables for this project */
 :root {
-  --color-background: var(--vt-c-white);
+  --color-background: var(--vt-c-gradient-background);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
 
@@ -62,6 +66,8 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
+  background-size: var(--vt-c-background-size);
+  animation: var(--vt-c-animation);
   transition:
     color 0.5s,
     background-color 0.5s;
@@ -83,4 +89,13 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root:root {
+  /*--van-button-primary-background: var(--vt-c-basecolor);*/
+
+  --van-cell-background: var(--vt-c-basecolor);
+  --van-background-2: linear-gradient(to bottom right, #23d5ab, #a8ff78);
+  --van-button-default-border-color: var(--vt-c-basecolor);
+  --van-border-color: linear-gradient(to bottom right, #23d5ab, #a8ff78);
 }

@@ -27,7 +27,7 @@ const sendMsg = () => {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #fff;
+  background-color: var(--vt-c-basecolor);
   padding: 10px;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -39,4 +39,5 @@ body.keyboard-open .bottom-input-container {
   position: absolute;
   bottom: auto;
 }
+
 </style>
