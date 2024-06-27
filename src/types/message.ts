@@ -1,5 +1,6 @@
 // 消息数据
 export interface Message {
+  msg_id?: string
   avatar?: string
   sender_username?: string
   sender_user_id: number
@@ -11,4 +12,5 @@ export interface Message {
   file_suffix?: string
   file?: Blob
   created_at: string
+  receipt_type?: number
 }

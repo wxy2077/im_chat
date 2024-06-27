@@ -1,8 +1,5 @@
 <template>
   <div class="login">
-
-    <div class="floating-element"></div>
-    <div class="floating-element"></div>
     <h1>欢迎登录iChat</h1>
     <div class="login-container ">
       <van-form @submit="onSubmit">

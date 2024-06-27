@@ -1,6 +1,7 @@
 <template>
   <div class="bottom-input-container">
-    <van-field v-model="inputValue" placeholder="" right-icon="send" clearable />
+    <van-field v-model="inputValue" placeholder="" />
+    <span style="margin-right: 10px;"></span>
     <van-button @click="sendMsg" size="small" type="primary" style="width: 50px">发送 </van-button>
   </div>
 </template>
@@ -27,7 +28,6 @@ const sendMsg = () => {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--vt-c-basecolor);
   padding: 10px;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
