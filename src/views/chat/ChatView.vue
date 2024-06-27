@@ -33,6 +33,9 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { v4 as uuidv4 } from 'uuid';
+
+
 import ChatItem from './comps/ChatItem.vue'
 import BottomInput from './comps/BottomInput.vue'
 import { useWebSocketStore } from '@/stores/websocketStore'
@@ -71,6 +74,8 @@ const loading = ref(false)
 let messageList = reactive<Message[]>([])
 let page = 1
 
+const DIALOG = `dialog-${targetUser.id}`
+
 onMounted(() => {
   const token = localStorage.getItem(TOKEN)
   if (!websocketStore.isConnected && token) {
@@ -81,16 +86,26 @@ onMounted(() => {
     user.value = JSON.parse(userData)
   }
 
-  getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
-    if (Array.isArray(res.data.list)) {
-      Object.assign(messageList, res.data.list)
-      page += 1
-    }
-  })
+  let msg = localStorage.getItem(DIALOG)
+  if (msg) {
+    const msgList: Message[] = JSON.parse(msg)
+    Object.assign(messageList, msgList)
+  }
+
+
+  // getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
+  //   if (Array.isArray(res.data.list)) {
+  //     Object.assign(messageList, res.data.list)
+  //     page += 1
+  //   }
+  // })
 })
 
 const sendMsg = (msg: string) => {
+
+  let msgId = uuidv4()
   let data: Message = {
+    msg_id: msgId,
     avatar: user.value.avatar,
     sender_user_id: user.value.id,
     sender_username: user.value.username,
@@ -107,7 +122,18 @@ const sendMsg = (msg: string) => {
 watch(
   () => websocketStore.message,
   (newMessage) => {
-    messageList.push(JSON.parse(newMessage))
+
+    let receiveMsg : Message = JSON.parse(newMessage)
+    if (receiveMsg.receipt_type === 1) {
+      for (let i=messageList.length-1; i>=0; i--) {
+        if (messageList[i].msg_id=== receiveMsg.msg_id){
+          messageList[i].receipt_type = 1
+          return
+        }
+      }
+    } else {
+      messageList.push(receiveMsg)
+    }
   }
 )
 
@@ -133,27 +159,35 @@ const onScroll = () => {
       // 记录当前的scrollHeight
       const previousScrollHeight = chatContainer.value.scrollHeight
 
-      getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
-        if (Array.isArray(res.data.list)) {
-          messageList.unshift(...res.data.list)
-
-          // 插入新消息后，使用 requestAnimationFrame 重新设置滚动位置
-          requestAnimationFrame(() => {
-            // 计算新的scrollTop 不至于很突兀
-            chatContainer.value!.scrollTop =
-              chatContainer.value!.scrollHeight - previousScrollHeight
-          })
-
-          // 判断是否还能继续加载
-          loading.value = res.data.pagination.totalPages <= page
-          page += 1
-        }
-      })
+      // TODO 需要重写获取消息
+      // getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
+      //   if (Array.isArray(res.data.list)) {
+      //     messageList.unshift(...res.data.list)
+      //
+      //     // 插入新消息后，使用 requestAnimationFrame 重新设置滚动位置
+      //     requestAnimationFrame(() => {
+      //       // 计算新的scrollTop 不至于很突兀
+      //       chatContainer.value!.scrollTop =
+      //         chatContainer.value!.scrollHeight - previousScrollHeight
+      //     })
+      //
+      //     // 判断是否还能继续加载
+      //     loading.value = res.data.pagination.totalPages <= page
+      //     page += 1
+      //   }
+      // })
     }
   }
 }
 
-onUnmounted(() => {
+const saveDialog = function (){
+  if(messageList.length>0){
+    localStorage.setItem(DIALOG, JSON.stringify(messageList))
+  }
+}
+
+//  保存朋友消息到聊天列表
+const saveFriendMsg = function (){
   const friend: ChatInfoItem = {
     content: '',
     created_at: '',
@@ -168,9 +202,9 @@ onUnmounted(() => {
   if (messageList.length > 0) {
     let lastMsg = messageList[messageList.length - 1]
     friend.content =
-      lastMsg.content && lastMsg.content.length < 20
-        ? lastMsg.content
-        : lastMsg.content.slice(0, 20) + '...'
+        lastMsg.content && lastMsg.content.length < 20
+            ? lastMsg.content
+            : lastMsg.content.slice(0, 20) + '...'
     friend.created_at = lastMsg.created_at
   } else {
     friend.created_at = formatDate(new Date())
@@ -192,6 +226,13 @@ onUnmounted(() => {
 
     localStorage.setItem(FRIEND_LIST_KEY, JSON.stringify(newFriendList))
   }
+}
+
+onUnmounted(() => {
+
+  saveDialog()
+
+  saveFriendMsg()
 })
 </script>
 

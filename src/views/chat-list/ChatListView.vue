@@ -212,7 +212,4 @@ onUnmounted(() => {
   font-size: 14px;
   margin-right: 5px;
 }
-.van-search{
-  background-color: var(--vt-c-basecolor);
-}
 </style>
