@@ -109,4 +109,5 @@ body {
 
   /*--van-black:var(--vt-c-basecolor);*/
   --van-black: ;
+  --van-nav-bar-icon-color: var(--vt-c-black);
 }
