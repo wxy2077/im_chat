@@ -12,6 +12,7 @@ export interface UserInfo {
 
 export interface ChatInfoItem {
     id: number
+    msg_id?: string
     account?: string
     username: string
     avatar: string

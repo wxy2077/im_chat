@@ -92,13 +92,18 @@ onMounted(() => {
     Object.assign(messageList, msgList)
   }
 
+  if (messageList.length <= 0) {
+    getMessage({ friend_user_id: targetUser.id, msg_id: targetUser.msg_id, page: page }).then((res: any) => {
+      if (Array.isArray(res.data.list)) {
+        messageList.unshift(...res.data.list)
 
-  // getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
-  //   if (Array.isArray(res.data.list)) {
-  //     Object.assign(messageList, res.data.list)
-  //     page += 1
-  //   }
-  // })
+        // 判断是否还能继续加载
+        loading.value = res.data.pagination.totalPages <= page
+        page += 1
+      }
+    })
+  }
+
 })
 
 const sendMsg = (msg: string) => {
@@ -159,30 +164,33 @@ const onScroll = () => {
       // 记录当前的scrollHeight
       const previousScrollHeight = chatContainer.value.scrollHeight
 
-      // TODO 需要重写获取消息
-      // getMessage({ friend_user_id: targetUser.id, page: page }).then((res: any) => {
-      //   if (Array.isArray(res.data.list)) {
-      //     messageList.unshift(...res.data.list)
-      //
-      //     // 插入新消息后，使用 requestAnimationFrame 重新设置滚动位置
-      //     requestAnimationFrame(() => {
-      //       // 计算新的scrollTop 不至于很突兀
-      //       chatContainer.value!.scrollTop =
-      //         chatContainer.value!.scrollHeight - previousScrollHeight
-      //     })
-      //
-      //     // 判断是否还能继续加载
-      //     loading.value = res.data.pagination.totalPages <= page
-      //     page += 1
-      //   }
-      // })
+      getMessage({ friend_user_id: targetUser.id, msg_id: messageList[0].msg_id, page: page }).then((res: any) => {
+        if (Array.isArray(res.data.list)) {
+          messageList.unshift(...res.data.list)
+
+          // 插入新消息后，使用 requestAnimationFrame 重新设置滚动位置
+          requestAnimationFrame(() => {
+            // 计算新的scrollTop 不至于很突兀
+            chatContainer.value!.scrollTop =
+              chatContainer.value!.scrollHeight - previousScrollHeight
+          })
+
+          // 判断是否还能继续加载
+          loading.value = res.data.pagination.totalPages <= page
+          page += 1
+        }
+      })
     }
   }
 }
 
+const getLastMsgList = function (messageList: Message[]) {
+  return messageList.slice(-50);
+}
+
 const saveDialog = function (){
   if(messageList.length>0){
-    localStorage.setItem(DIALOG, JSON.stringify(messageList))
+    localStorage.setItem(DIALOG, JSON.stringify(getLastMsgList(messageList)))
   }
 }
 

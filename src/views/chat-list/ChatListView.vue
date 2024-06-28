@@ -67,7 +67,7 @@ const chatInfoItem = reactive<ChatInfoItem[]>([])
 const toChart = (item: any) => {
   router.push({
     name: 'chat',
-    state: {targetUser: {id: item.id, username: item.username, avatar: item.avatar}}
+    state: {targetUser: {id: item.id, msg_id: item.msg_id, username: item.username, avatar: item.avatar}}
   })
 }
 
@@ -139,6 +139,7 @@ watch(
       if (!isExist) {
         let newFriend: ChatInfoItem = {
           id: msg.sender_user_id,
+          msg_id: msg.msg_id,
           username: msg.sender_username,
           avatar: msg.avatar,
           content: msg.content,
@@ -198,7 +199,6 @@ onUnmounted(() => {
 
 .user-info > .message {
   font-size: 14px;
-  color: var(--vt-c-basecolor);
   position: relative;
   bottom: -10px;
 }
